@@ -1,0 +1,20 @@
+#
+# Build set for NTP
+#
+
+%define release 1
+
+#
+# RTEMS Version
+#
+%define rtems_version 4.11
+
+#
+# The RTEMS URL paths.
+#
+%include rtems-urls.bset
+
+#
+# Build NTP.
+#
+net/lwip-1-4-0.cfg
