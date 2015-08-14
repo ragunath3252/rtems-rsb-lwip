@@ -1,0 +1,127 @@
+From 2e8b0d1af4cb40d98148f1987b79a2c2fe90b3c0 Mon Sep 17 00:00:00 2001
+From: ragunath <ragunath3252@gmail.com>
+Date: Fri, 14 Aug 2015 22:32:16 +0530
+Subject: [PATCH] CPSW lwIP driver library build files
+
+---
+ rtems/config/4.11/net/cpsw.bset  | 20 ++++++++++++++++
+ rtems/config/net/cpsw-1-1.cfg    | 20 ++++++++++++++++
+ source-builder/config/cpsw-1.cfg | 52 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+)
+ create mode 100644 rtems/config/4.11/net/cpsw.bset
+ create mode 100644 rtems/config/net/cpsw-1-1.cfg
+ create mode 100644 source-builder/config/cpsw-1.cfg
+
+diff --git a/rtems/config/4.11/net/cpsw.bset b/rtems/config/4.11/net/cpsw.bset
+new file mode 100644
+index 0000000..768256e
+--- /dev/null
++++ b/rtems/config/4.11/net/cpsw.bset
+@@ -0,0 +1,20 @@
++#
++# Build set for lwIP cpsw driver
++#
++
++%define release 1
++
++#
++# RTEMS Version
++#
++%define rtems_version 4.11
++
++#
++# The RTEMS URL paths.
++#
++%include rtems-urls.bset
++
++#
++# Build lwIP CPSW driver.
++#
++net/cpsw-1-1.cfg
+diff --git a/rtems/config/net/cpsw-1-1.cfg b/rtems/config/net/cpsw-1-1.cfg
+new file mode 100644
+index 0000000..22cfb77
+--- /dev/null
++++ b/rtems/config/net/cpsw-1-1.cfg
+@@ -0,0 +1,20 @@
++#
++#  LWIP CPSW
++#
++
++%if %{release} == %{nil}
++ %define release 1
++%endif
++
++%include %{_configdir}/rtems-bsp.cfg
++
++#
++# CPSW Version
++#
++%define cpsw_version cpsw-1-1
++
++%hash  md5 master.zip 16f22d2a7add4e656aafb3d42584dbdf
++#
++# lwIP cpsw Build configuration
++#
++%include %{_configdir}/cpsw-1.cfg
+diff --git a/source-builder/config/cpsw-1.cfg b/source-builder/config/cpsw-1.cfg
+new file mode 100644
+index 0000000..0563e97
+--- /dev/null
++++ b/source-builder/config/cpsw-1.cfg
+@@ -0,0 +1,52 @@
++#
++# cpsw lwIP Version 1.
++#
++# This configuration file configure's, make's and install's lwIP cpsw driver.
++#
++
++%if %{release} == %{nil}
++%define release 1
++%endif
++
++Name:      cpsw-%{cpsw_version}-%{_host}-%{release}
++Summary:   Light weight TCP/IP stack -- CPSW driver
++Version:   %{cpsw_version}
++Release:   %{release}
++URL: 	   https://github.com/ragunath3252/cpsw-lwip.git
++BuildRoot: %{_tmppath}/%{name}-root-%(%{__id_u} -n)
++
++#
++# CPSW driver Source
++#
++%source set cpsw https://github.com/ragunath3252/cpsw-lwip/archive/master.zip
++#
++# Prepare the source code.
++#
++%prep
++  build_top=$(pwd)
++
++  source_dir_cpsw="cpsw-lwip-master"
++  %source setup cpsw -q -n ${source_dir_cpsw}
++  %patch setup cpsw -p1
++
++  cd ${build_top}
++
++%build
++  build_top=$(pwd)
++
++  %{build_directory}
++
++  mkdir -p ${build_dir}
++  cd ${build_dir}
++
++  %{host_build_flags}
++
++  cd ${build_top}/${source_dir_cpsw}
++  export RTEMS_MAKEFILE_PATH=%{_exec_prefix}
++  %{__make} all
++
++#%install
++  build_top=$(pwd)/%{cpsw_version}
++  
++  %{__make} install
++
+-- 
+1.9.1
+
