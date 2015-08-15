@@ -1,13 +1,16 @@
-From 2e8b0d1af4cb40d98148f1987b79a2c2fe90b3c0 Mon Sep 17 00:00:00 2001
+From e740e14f904a117a865840c3ecb7a6c4b06b7445 Mon Sep 17 00:00:00 2001
 From: ragunath <ragunath3252@gmail.com>
-Date: Fri, 14 Aug 2015 22:32:16 +0530
-Subject: [PATCH] CPSW lwIP driver library build files
+Date: Sat, 15 Aug 2015 12:15:02 +0530
+Subject: [PATCH] CPSW lwIP library build changes
 
+This change builds the cpsw driver as a library for lwIP. The application can link to the
+lwIP & driver libraries. The driver is based on TI Starterware & is taken from lwIP port done by Marcos/Daniel.
+The driver files are available at https://github.com/ragunath3252/cpsw-lwip.git
 ---
  rtems/config/4.11/net/cpsw.bset  | 20 ++++++++++++++++
- rtems/config/net/cpsw-1-1.cfg    | 20 ++++++++++++++++
+ rtems/config/net/cpsw-1-1.cfg    | 19 +++++++++++++++
  source-builder/config/cpsw-1.cfg | 52 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 92 insertions(+)
+ 3 files changed, 91 insertions(+)
  create mode 100644 rtems/config/4.11/net/cpsw.bset
  create mode 100644 rtems/config/net/cpsw-1-1.cfg
  create mode 100644 source-builder/config/cpsw-1.cfg
@@ -40,10 +43,10 @@ index 0000000..768256e
 +net/cpsw-1-1.cfg
 diff --git a/rtems/config/net/cpsw-1-1.cfg b/rtems/config/net/cpsw-1-1.cfg
 new file mode 100644
-index 0000000..22cfb77
+index 0000000..10ffc8d
 --- /dev/null
 +++ b/rtems/config/net/cpsw-1-1.cfg
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,19 @@
 +#
 +#  LWIP CPSW
 +#
@@ -59,14 +62,13 @@ index 0000000..22cfb77
 +#
 +%define cpsw_version cpsw-1-1
 +
-+%hash  md5 master.zip 16f22d2a7add4e656aafb3d42584dbdf
 +#
 +# lwIP cpsw Build configuration
 +#
 +%include %{_configdir}/cpsw-1.cfg
 diff --git a/source-builder/config/cpsw-1.cfg b/source-builder/config/cpsw-1.cfg
 new file mode 100644
-index 0000000..0563e97
+index 0000000..dbfda51
 --- /dev/null
 +++ b/source-builder/config/cpsw-1.cfg
 @@ -0,0 +1,52 @@
@@ -90,14 +92,14 @@ index 0000000..0563e97
 +#
 +# CPSW driver Source
 +#
-+%source set cpsw https://github.com/ragunath3252/cpsw-lwip/archive/master.zip
++%source set cpsw git://github.com/ragunath3252/cpsw-lwip.git
 +#
 +# Prepare the source code.
 +#
 +%prep
 +  build_top=$(pwd)
 +
-+  source_dir_cpsw="cpsw-lwip-master"
++  source_dir_cpsw="cpsw-lwip"
 +  %source setup cpsw -q -n ${source_dir_cpsw}
 +  %patch setup cpsw -p1
 +
@@ -119,7 +121,7 @@ index 0000000..0563e97
 +
 +#%install
 +  build_top=$(pwd)/%{cpsw_version}
-+  
++
 +  %{__make} install
 +
 -- 
